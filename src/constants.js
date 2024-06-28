@@ -1,3 +1,3 @@
-const DBNAME = "Youtube";
+export const DB_NAME = 'Youtube';
 
- export default DBNAME;
+ 
