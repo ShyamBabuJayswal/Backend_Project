@@ -28,7 +28,9 @@ app.use(express.urlencoded({
 
  //routes declartions
 
-app.use("/users",userRouter)  
+app.use("/api/v1/users",userRouter)  
+
+// http://localhost:8000/api/v1/users/register
 
 
 
