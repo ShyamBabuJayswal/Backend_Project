@@ -146,8 +146,8 @@ const options ={
    await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set:{
-                resfreshToken:undefined
+            $unset:{
+                resfreshToken:1
             }
         },
         {
