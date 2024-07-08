@@ -25,7 +25,7 @@ const getAllVideoComment = asyncHandler(async(req,res) => {
     const pipeline = [
         {
             $match:{
-                video:mongoose.Schema.Types.ObjectId(videoId)
+                video:mongoose.Types.ObjectId(videoId)
                    },
                 },           
             {
@@ -82,8 +82,36 @@ const getAllVideoComment = asyncHandler(async(req,res) => {
 });
 
 
+// add comments to the video
+const addComment = asyncHandler(async(req,res) => {
+  const {videoId,content} = req.body;
+  if(!videoId || !content){
+    return new ApiError(404,"Invalid video id or content");
+  }
 
-        
+  try {
+     const newComment= new comment({
+        video:videoId,
+        content:content,
+        owner:req.user._id,
+     })
+     const savedComment=await newComment.save();
+     res.status(201).json(new ApiResponse({
+        success: true,
+        message: "Comment added successfully",
+        comment: savedComment
+    }));
+     
+  } catch (error) {
+    return new ApiError(500,"Failed to add comment");
+  }
+
+})
+
+
+  export {
+    getAllVideoComment
+  }      
     
 
 
