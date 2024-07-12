@@ -108,9 +108,67 @@ const addComment = asyncHandler(async(req,res) => {
 
 })
 
+//update comment 
+
+  const updateComment = asyncHandler(async(req,res) => {
+         const {commentId}  = req.params;
+         const {content}  =  req.body;
+
+         if(!content){
+            throw new ApiError(400,"Content is required to update the comment")
+         }
+          
+        try {
+          const comment = await comment.findById(commentId);
+          if(!comment){
+            throw new ApiError(400,"Comment is required");
+          }    
+
+          //validate that user is allowed to change
+          if(comment.owner.toString() == req.user._id.toString()){
+            throw new ApiError(400,"You done have permission to change it");
+          }
+          //update comment
+          comment.content = content;
+          const updateComment =await comment.save();
+          res.status(200).json(new ApiResponse({
+            success: true,
+            message: "Comment updated successfully",
+            comment: updatedComment
+        }));
+    } catch (error) {
+        throw new ApiError(500, "Failed to update comment", error.message);
+    }
+
+  })
+  //Delete comment 
+
+  const deleteComment = asyncHandler(async (req, res) => {
+    const {commentId} = req.params;
+    if(!commentId){
+        return new ApiError(400,"CommentId is required");
+    }
+    const comment = await comment.findById(commentId);
+    if(!comment){
+        return new ApiError(400,"Comment is required");
+    }
+    await comment.remove();
+  
+    res
+    .status
+    .json({
+       success: true,
+       message: "Comment deleted successfully",
+            
+    })
+
+})
 
   export {
-    getAllVideoComment
+    getAllVideoComment,
+    addComment,
+    updateComment,
+    deleteComment,
   }      
     
 
