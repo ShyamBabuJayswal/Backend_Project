@@ -14,10 +14,10 @@ const getAllVideoComment = asyncHandler(async(req,res) => {
     const pageNumber = parseInt(page);
     const limitNumber = parseInt(limit);
 
-    if(!NaN(pageNumber) || pageNumber<1){
+    if(NaN(pageNumber) || pageNumber<1){
         return new ApiError(400,"Invalid page number");
     }
-    if(!NaN(limitNumber) || limitNumber<10){
+    if(NaN(limitNumber) || limitNumber<10){
         return new ApiError(400,"Invalid limit number");
     }
     try{
@@ -36,8 +36,8 @@ const getAllVideoComment = asyncHandler(async(req,res) => {
          {
             $lookup:{
                 from:"user",
-                localFeild:"owner",
-                foriegnFeild:"_id",
+                localField: "owner",
+                    foreignField: "_id",
                 as:"owner",
             },
          } ,
@@ -103,14 +103,14 @@ const addComment = asyncHandler(async(req,res) => {
     }));
      
   } catch (error) {
-    return new ApiError(500,"Failed to add comment");
+    throw new ApiError(500,"Failed to add comment");
   }
 
 })
 
 //update comment 
 
-  const updateComment = asyncHandler(async(req,res) => {
+  const updatedComment = asyncHandler(async(req,res) => {
          const {commentId}  = req.params;
          const {content}  =  req.body;
 
@@ -146,11 +146,15 @@ const addComment = asyncHandler(async(req,res) => {
   const deleteComment = asyncHandler(async (req, res) => {
     const {commentId} = req.params;
     if(!commentId){
-        return new ApiError(400,"CommentId is required");
+        throw new ApiError(400,"CommentId is required");
     }
+
     const comment = await comment.findById(commentId);
     if(!comment){
-        return new ApiError(400,"Comment is required");
+        throw new ApiError(400,"Comment is required");
+    }
+    if (comment.owner.toString() !== req.user._id.toString()) {
+        throw new ApiError(403, "You don't have permission to delete this comment");
     }
     await comment.remove();
   
